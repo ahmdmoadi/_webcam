@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>webcam</title>
+<style type="text/css">
+*{
+margin:0;
+padding:0;
+}
+video {
+opacity:0%;
+}
+
+img {
+display:none;
+border:none;
+}/*
+button {
+width:200px;
+height:200px;
+border-radius:50%;
+font-family:Arial,sans-serif;
+font-size:3rem;
+position:fixed;
+bottom:10px;
+right:10px;
+animation:ch ease-in-out .5 infinite;
+color:white;
+background:black;
+}*/
+/*@keyframes ch {
+1%{background:blue;},
+50%{background:green;},
+80%{background:red;},
+100%{background:black;}
+}*//*
+canvas {
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+border-radius:35px;
+}*/
+#cont{
+display:inline-block;
+}
+</style>
+</head>
+<body>
+<video autoplay muted id="video1"></video>
+<div id="cont">
+<canvas id="myCanvas" width="480" height="640" ></canvas>
+
+</div>
+
+<br>
+<button id="tp">Take Picture</button>
+<p id="p1"></p>
+<p id="p2"></p>
+<!--<img id="img" width="600" height="800">-->
+<script type="text/javascript">
+
+navigator.mediaDevices.getUserMedia({video:true})
+.then(s => {v.srcObject = s}).catch(err => {console.log(err.message)})
+
+var v = document.getElementById("video1");
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext('2d');
+var i;
+
+let vheight, vwidth;
+v.addEventListener("canplay", (e) => {
+vheight= e.target.videoHeight;
+vwidth = e.target.videoWidth;
+
+c.width = (vwidth);
+c.height = (vheight);
+
+//setTimeout(() => {alert(vwidth)}, 2000)
+//setTimeout(() => {alert(vheight)}, 2000)
+})
+
+let imgdat;
+let blobjjd;
+v.addEventListener('play',function() {
+i=window.setInterval(function() {
+ctx.drawImage(v,5,5,vwidth, vheight)},20);
+imgdat = ctx.getImageData(0,0,600,800);
+canvas.toBlob(blob => {
+let url = URL.createObjectURL(blob);
+let img = document.getElementById("img")
+img.addEventListener("click", function() {
+img.src = url;
+})
+})
+},false);
+
+
+v.addEventListener('pause',function() {window.clearInterval(i);},false);
+v.addEventListener('ended',function() {clearInterval(i);},false);
+
+function g(x)
+{return document.getElementById(x)}
+document.addEventListener('DOMContentLoaded', function() {
+   g("tp").addEventListener("click", () => {
+   domtoimage.toBlob(g("cont"))
+   .then((blob) => {
+   window.saveAs(blob, `webcam_${(Math.floor(Math.random()*1000000))}.png`);
+   // document.body.insertAdjacentHTML("beforeend", `<img src="${blob}" />`);
+   // console.log(""+blob);
+   }).catch(err => {console.log(err.message)})
+   })
+   });
+</script>
+<script src="domtoimage.js"></script>
+<script src="FileSaver.js"></script>
+</body>
+</html>
